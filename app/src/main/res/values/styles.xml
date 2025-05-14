@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Thème principal de l'application -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Personnalisez votre thème ici -->
+        <item name="colorPrimary">#248728</item> <!-- Vert foncé pour meilleur contraste -->
+        <item name="colorPrimaryDark">#1B5E20</item> <!-- Variante plus foncée pour la barre de statut -->
+        <item name="colorAccent">#FF4081</item> <!-- Couleur d'accentuation -->
+    </style>
+</resources>

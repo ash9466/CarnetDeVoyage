@@ -1,0 +1,20 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.0.1'
+
+        // NOTE: Ne pas placer vos dépendances d'application ici; elles appartiennent
+        // au module individuel build.gradle
+    }
+}
+
+// Le bloc allprojects est désormais déconseillé car les dépôts sont définis dans settings.gradle
+// Nous le supprimons pour éviter l'erreur
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

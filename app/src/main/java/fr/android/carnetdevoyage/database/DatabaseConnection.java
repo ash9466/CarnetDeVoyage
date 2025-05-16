@@ -13,26 +13,20 @@ import java.util.List;
 
 public class DatabaseConnection {
     private static final String TAG = "DatabaseConnection";
-
-    // Database credentials - consider storing these securely
     private static final String DB_URL = "jdbc:mariadb://10.0.2.2:3307/carnet_voyage";
     private static final String USER = "root";
     private static final String PASS = "";
 
-    // Interface for database operation callbacks
     public interface OnDatabaseOperationListener {
         void onSelectComplete(List<TravelEntry> entries);
         void onOperationComplete(boolean success);
     }
 
-    // Method to get database connection
     public static Connection getConnection() {
         Connection conn = null;
         try {
-            // Load the MariaDB JDBC driver
             Class.forName("org.mariadb.jdbc.Driver");
 
-            // Get connection
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
             Log.d(TAG, "Database connection established successfully");
         } catch (ClassNotFoundException e) {
@@ -45,27 +39,6 @@ public class DatabaseConnection {
         return conn;
     }
 
-    // Method to execute SELECT query
-    public static void executeSelect(String query, OnDatabaseOperationListener listener, String... params) {
-        new DBTask(listener, "SELECT").execute(prepareParams(query, params));
-    }
-
-    // Method to execute INSERT query
-    public static void executeInsert(String query, OnDatabaseOperationListener listener, String... params) {
-        new DBTask(listener, "INSERT").execute(prepareParams(query, params));
-    }
-
-    // Method to execute UPDATE query
-    public static void executeUpdate(String query, OnDatabaseOperationListener listener, String... params) {
-        new DBTask(listener, "UPDATE").execute(prepareParams(query, params));
-    }
-
-    // Method to execute DELETE query
-    public static void executeDelete(String query, OnDatabaseOperationListener listener, String... params) {
-        new DBTask(listener, "DELETE").execute(prepareParams(query, params));
-    }
-
-    // Helper method to prepare parameters
     private static String[] prepareParams(String query, String... params) {
         String[] allParams = new String[params.length + 1];
         allParams[0] = query;
@@ -73,7 +46,6 @@ public class DatabaseConnection {
         return allParams;
     }
 
-    // AsyncTask for database operations
     public static class DBTask extends AsyncTask<String, Void, Boolean> {
         private OnDatabaseOperationListener listener;
         private String operation;

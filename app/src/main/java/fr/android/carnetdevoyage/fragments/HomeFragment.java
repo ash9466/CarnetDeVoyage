@@ -15,42 +15,36 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import fr.android.carnetdevoyage.R;
 import fr.android.carnetdevoyage.adapters.TravelEntryAdapter;
-import fr.android.carnetdevoyage.database.TravelEntry;
 import fr.android.carnetdevoyage.database.TravelViewModel;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class HomeFragment extends Fragment {
     private RecyclerView recyclerView;
     private TextView emptyView;
     private TravelEntryAdapter adapter;
-    private List<TravelEntry> entryList;
     private TravelViewModel travelViewModel;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-            @Nullable Bundle savedInstanceState) {
+                             @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         recyclerView = view.findViewById(R.id.recycler_view);
         emptyView = view.findViewById(R.id.empty_view);
 
-        entryList = new ArrayList<>();
-        adapter = new TravelEntryAdapter(getContext(), entryList);
+        adapter = new TravelEntryAdapter(getContext(), new ArrayList<>());
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
 
-        travelViewModel = new ViewModelProvider(this).get(TravelViewModel.class);
+        travelViewModel = new ViewModelProvider(requireActivity()).get(TravelViewModel.class);
 
         travelViewModel.getAllEntries().observe(getViewLifecycleOwner(), entries -> {
-            entryList.clear();
-            entryList.addAll(entries);
-            adapter.notifyDataSetChanged();
+            adapter.updateEntries(entries);
 
-            if (entryList.isEmpty()) {
+            if (entries.isEmpty()) {
                 recyclerView.setVisibility(View.GONE);
                 emptyView.setVisibility(View.VISIBLE);
             } else {

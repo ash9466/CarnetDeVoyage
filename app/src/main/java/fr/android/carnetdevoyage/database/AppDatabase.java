@@ -7,13 +7,10 @@ import androidx.room.RoomDatabase;
 
 @Database(entities = {TravelEntry.class}, version = 1, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
-    // DAO accessor
     public abstract TravelEntryDAO travelEntryDao();
 
-    // Singleton instance
     private static volatile AppDatabase INSTANCE;
 
-    // Get database instance
     public static AppDatabase getDatabase(final Context context) {
         if (INSTANCE == null) {
             synchronized (AppDatabase.class) {
@@ -22,7 +19,7 @@ public abstract class AppDatabase extends RoomDatabase {
                                     context.getApplicationContext(),
                                     AppDatabase.class,
                                     "carnet_voyage.db")
-                            .fallbackToDestructiveMigration()  // Reset database if migration fails
+                            .fallbackToDestructiveMigration()
                             .build();
                 }
             }

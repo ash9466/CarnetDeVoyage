@@ -15,6 +15,7 @@ import fr.android.carnetdevoyage.R;
 import fr.android.carnetdevoyage.database.TravelEntry;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 public class TravelEntryAdapter extends RecyclerView.Adapter<TravelEntryAdapter.TravelEntryViewHolder> {
@@ -42,13 +43,17 @@ public class TravelEntryAdapter extends RecyclerView.Adapter<TravelEntryAdapter.
         holder.textLocation.setText(String.format("Lat: %.4f, Long: %.4f", entry.getLatitude(), entry.getLongitude()));
         holder.textDate.setText(entry.getDate());
 
-        // Charger l'image si disponible
         if (entry.getImagePath() != null && !entry.getImagePath().isEmpty()) {
             File imgFile = new File(entry.getImagePath());
             if (imgFile.exists()) {
                 holder.imageThumbnail.setImageBitmap(BitmapFactory.decodeFile(imgFile.getAbsolutePath()));
             }
         }
+    }
+
+    public void updateEntries(List<TravelEntry> newEntries) {
+        this.entryList = new ArrayList<>(newEntries);
+        notifyDataSetChanged();
     }
 
     @Override
@@ -66,11 +71,6 @@ public class TravelEntryAdapter extends RecyclerView.Adapter<TravelEntryAdapter.
             textTitle = itemView.findViewById(R.id.text_title);
             textLocation = itemView.findViewById(R.id.text_location);
             textDate = itemView.findViewById(R.id.text_date);
-
-            // Ajouter un écouteur de clic si nécessaire
-            itemView.setOnClickListener(v -> {
-                // Code pour gérer le clic sur un élément
-            });
         }
     }
 }

@@ -27,11 +27,9 @@ public class TravelEntry {
     @ColumnInfo(name = "date")
     private String date;
 
-    // Constructeur vide
     public TravelEntry() {
     }
 
-    // Constructeur avec paramètres
     public TravelEntry(int id, String title, String description, double latitude, double longitude, String imagePath, String date) {
         this.id = id;
         this.title = title;
@@ -42,7 +40,6 @@ public class TravelEntry {
         this.date = date;
     }
 
-    // Constructor without ID for new entries
     public TravelEntry(String title, String description, double latitude, double longitude, String imagePath, String date) {
         this.title = title;
         this.description = description;

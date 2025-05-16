@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace 'com.example.carnetdevoyage'  // Ajoutez cette ligne
+    namespace 'fr.android.carnetdevoyage'  // Ajoutez cette ligne
     compileSdk 34
 
     defaultConfig {
@@ -42,6 +42,10 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.12.0'
     implementation 'com.google.android.material:material:1.9.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+
+    // Google Maps dependencies
+    implementation 'com.google.android.gms:play-services-maps:18.2.0'
+    implementation 'com.google.android.gms:play-services-location:21.1.0'
 
     // Dépendances pour le projet Carnet de Voyage
     implementation 'androidx.recyclerview:recyclerview:1.3.0'

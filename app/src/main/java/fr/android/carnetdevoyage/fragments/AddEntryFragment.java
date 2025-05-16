@@ -14,7 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.carnetdevoyage.R;
+import fr.android.carnetdevoyage.R;
 import fr.android.carnetdevoyage.database.TravelEntry;
 import fr.android.carnetdevoyage.database.TravelViewModel;
 import com.google.android.material.textfield.TextInputEditText;

@@ -11,7 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.carnetdevoyage.R;
+import fr.android.carnetdevoyage.R;
 import fr.android.carnetdevoyage.database.TravelEntry;
 
 import java.io.File;

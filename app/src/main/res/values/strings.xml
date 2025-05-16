@@ -28,4 +28,9 @@
     <string name="error_title_required">Title is required</string>
     <string name="entry_saved">Entry saved successfully</string>
     <string name="error_saving_entry">Error saving entry</string>
+    <string name="gps_disabled_message">Your GPS is disabled, please do enable it</string>
+    <string name="enable_gps">Yes</string>
+    <string name="quit">No - Quit</string>
+    <string name="latitude_label">Latitude: </string>
+    <string name="longitude_label">Longitude: </string>
 </resources>

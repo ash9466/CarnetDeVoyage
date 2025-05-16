@@ -6,7 +6,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
-import com.example.carnetdevoyage.R;
+import fr.android.carnetdevoyage.R;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,6 +19,7 @@ import fr.android.carnetdevoyage.database.DatabaseConnection;
 import fr.android.carnetdevoyage.database.TravelEntry;
 import fr.android.carnetdevoyage.fragments.AddEntryFragment;
 import fr.android.carnetdevoyage.fragments.HomeFragment;
+import fr.android.carnetdevoyage.fragments.MapFragment;
 import fr.android.carnetdevoyage.utils.LocaleHelper;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
@@ -44,7 +45,7 @@ public class MainActivity extends AppCompatActivity
 
         // Configuration de la toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
-        //setSupportActionBar(toolbar);
+        // setSupportActionBar(toolbar);
 
         // Configuration du drawer (menu latéral)
         drawer = findViewById(R.id.drawer_layout);
@@ -104,7 +105,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void showLanguageDialog() {
-        String[] languages = {"English", "Français"};
+        String[] languages = { "English", "Français" };
         android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
         builder.setTitle(R.string.language);
         builder.setSingleChoiceItems(languages, -1, (dialog, which) -> {
@@ -133,14 +134,12 @@ public class MainActivity extends AppCompatActivity
                     .replace(R.id.fragment_container, new HomeFragment())
                     .commit();
         } else if (id == R.id.nav_map) {
-            // Cette fonctionnalité serait implémentée par votre binôme
-            Toast.makeText(this, "Fonctionnalité de carte non implémentée", Toast.LENGTH_SHORT).show();
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new MapFragment())
+                    .commit();
         } else if (id == R.id.nav_gallery) {
             // Cette fonctionnalité serait implémentée par votre binôme
             Toast.makeText(this, "Fonctionnalité de galerie non implémentée", Toast.LENGTH_SHORT).show();
-        } else if (id == R.id.nav_settings) {
-            // Afficher les paramètres
-            Toast.makeText(this, "Paramètres non implémentés", Toast.LENGTH_SHORT).show();
         } else if (id == R.id.nav_sync) {
             // Synchroniser avec la base de données externe
             Toast.makeText(this, R.string.sync_data, Toast.LENGTH_SHORT).show();

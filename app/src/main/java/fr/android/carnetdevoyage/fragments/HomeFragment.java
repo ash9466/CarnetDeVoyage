@@ -13,7 +13,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.carnetdevoyage.R;
+import fr.android.carnetdevoyage.R;
 import fr.android.carnetdevoyage.adapters.TravelEntryAdapter;
 import fr.android.carnetdevoyage.database.TravelEntry;
 import fr.android.carnetdevoyage.database.TravelViewModel;

@@ -37,17 +37,13 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Appliquer la langue sauvegardée
         String language = LocaleHelper.getLanguage(this);
         LocaleHelper.setLocale(this, language);
 
         setContentView(R.layout.activity_main);
 
-        // Configuration de la toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
-        // setSupportActionBar(toolbar);
 
-        // Configuration du drawer (menu latéral)
         drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -57,11 +53,9 @@ public class MainActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        // Configurer le bouton d'ajout
         fabAdd = findViewById(R.id.fab_add);
         fabAdd.setOnClickListener(v -> openAddEntryFragment());
 
-        // Afficher le fragment d'accueil par défaut
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, new HomeFragment())
@@ -126,7 +120,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Gérer les sélections de menu
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
@@ -138,26 +131,18 @@ public class MainActivity extends AppCompatActivity
                     .replace(R.id.fragment_container, new MapFragment())
                     .commit();
         } else if (id == R.id.nav_gallery) {
-            // Cette fonctionnalité serait implémentée par votre binôme
             Toast.makeText(this, "Fonctionnalité de galerie non implémentée", Toast.LENGTH_SHORT).show();
-        } else if (id == R.id.nav_sync) {
-            // Synchroniser avec la base de données externe
-            Toast.makeText(this, R.string.sync_data, Toast.LENGTH_SHORT).show();
-            // Cette opération est déjà gérée par le HomeFragment
         }
 
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
-    // Callbacks pour les opérations de base de données
     @Override
     public void onSelectComplete(List<TravelEntry> entries) {
-        // Non utilisé ici, géré par les fragments
     }
 
     @Override
     public void onOperationComplete(boolean success) {
-        // Non utilisé ici, géré par les fragments
     }
 }

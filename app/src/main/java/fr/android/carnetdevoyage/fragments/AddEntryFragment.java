@@ -1,6 +1,14 @@
 package fr.android.carnetdevoyage.fragments;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +19,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -18,12 +29,21 @@ import fr.android.carnetdevoyage.R;
 import fr.android.carnetdevoyage.database.TravelEntry;
 import fr.android.carnetdevoyage.database.TravelViewModel;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
 public class AddEntryFragment extends Fragment {
+    private static final int PERM_REQUEST = 1;
+    private static final int SETTINGS_RESULT = 1;
+
     private TextInputEditText editTitle, editDescription;
     private TextView textLocationInfo;
     private ImageView imagePreview;
@@ -33,13 +53,16 @@ public class AddEntryFragment extends Fragment {
     private double latitude = 0, longitude = 0;
     private String imagePath = "";
 
+    private FusedLocationProviderClient fusedLocationClient;
+    private LocationManager locationManager;
+    private LocationCallback locationCallback;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_add_entry, container, false);
 
-        // Initialize views
         editTitle = view.findViewById(R.id.edit_title);
         editDescription = view.findViewById(R.id.edit_description);
         textLocationInfo = view.findViewById(R.id.text_location_info);
@@ -48,10 +71,23 @@ public class AddEntryFragment extends Fragment {
         buttonTakePhoto = view.findViewById(R.id.button_take_photo);
         buttonSave = view.findViewById(R.id.button_save);
 
-        // Initialize ViewModel
         travelViewModel = new ViewModelProvider(this).get(TravelViewModel.class);
+        locationManager = (LocationManager) requireActivity().getSystemService(requireActivity().LOCATION_SERVICE);
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
 
-        // Configure button listeners
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(@NonNull LocationResult locationResult) {
+                Location location = locationResult.getLastLocation();
+                if (location != null) {
+                    latitude = location.getLatitude();
+                    longitude = location.getLongitude();
+                    textLocationInfo.setText(String.format(Locale.getDefault(),
+                            "Lat: %.6f, Long: %.6f", latitude, longitude));
+                }
+            }
+        };
+
         buttonLocation.setOnClickListener(v -> getLocation());
         buttonTakePhoto.setOnClickListener(v -> takePhoto());
         buttonSave.setOnClickListener(v -> saveEntry());
@@ -60,12 +96,77 @@ public class AddEntryFragment extends Fragment {
     }
 
     private void getLocation() {
-        // This method would be implemented by your partner for the geolocation part
-        Toast.makeText(getContext(), "Geolocation feature not implemented", Toast.LENGTH_SHORT).show();
+        if (ActivityCompat.checkSelfPermission(requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(requireContext(),
+                        Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
+            if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                enableGPS();
+            } else {
+                requestLocationUpdates();
+            }
+        } else {
+            String[] perms = new String[] { Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION };
+            requestPermissions(perms, PERM_REQUEST);
+        }
+    }
+
+    private void enableGPS() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+        builder.setMessage(R.string.gps_disabled_message)
+                .setCancelable(false)
+                .setPositiveButton(R.string.enable_gps, (dialog, id) -> {
+                    startActivityForResult(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS),
+                            SETTINGS_RESULT);
+                })
+                .setNegativeButton(R.string.quit, (dialog, id) -> dialog.cancel());
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    @SuppressLint("MissingPermission")
+    @RequiresApi(api = Build.VERSION_CODES.S)
+    private void requestLocationUpdates() {
+        LocationRequest.Builder lrb = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY);
+        lrb.setMinUpdateDistanceMeters(10);
+        lrb.setMinUpdateIntervalMillis(5000);
+
+        LocationRequest lr = lrb.build();
+        fusedLocationClient.requestLocationUpdates(lr, locationCallback, Looper.getMainLooper());
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+            @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == PERM_REQUEST) {
+            if (grantResults.length > 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED &&
+                    grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    requestLocationUpdates();
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (ActivityCompat.checkSelfPermission(requireContext(),
+                    Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                    ActivityCompat.checkSelfPermission(requireContext(),
+                            Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                requestLocationUpdates();
+            }
+        }
     }
 
     private void takePhoto() {
-        // This method would be implemented by your partner for the photo part
+        // TODO
         Toast.makeText(getContext(), "Photo feature not implemented", Toast.LENGTH_SHORT).show();
     }
 
@@ -78,11 +179,9 @@ public class AddEntryFragment extends Fragment {
             return;
         }
 
-        // Get current date
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         String currentDate = sdf.format(new Date());
 
-        // Create new entry
         TravelEntry entry = new TravelEntry();
         entry.setTitle(title);
         entry.setDescription(description);
@@ -91,13 +190,10 @@ public class AddEntryFragment extends Fragment {
         entry.setImagePath(imagePath);
         entry.setDate(currentDate);
 
-        // Save to database using ViewModel
         travelViewModel.insert(entry);
 
-        // Show success message
         Toast.makeText(getContext(), R.string.entry_saved, Toast.LENGTH_SHORT).show();
 
-        // Clear fields after saving
         editTitle.setText("");
         editDescription.setText("");
         textLocationInfo.setText(R.string.location_not_available);

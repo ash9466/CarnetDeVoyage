@@ -37,23 +37,19 @@ public class HomeFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recycler_view);
         emptyView = view.findViewById(R.id.empty_view);
 
-        // Initialize list and adapter
         entryList = new ArrayList<>();
         adapter = new TravelEntryAdapter(getContext(), entryList);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
 
-        // Initialize ViewModel
         travelViewModel = new ViewModelProvider(this).get(TravelViewModel.class);
 
-        // Observe the LiveData
         travelViewModel.getAllEntries().observe(getViewLifecycleOwner(), entries -> {
             entryList.clear();
             entryList.addAll(entries);
             adapter.notifyDataSetChanged();
 
-            // Show empty view if no entries
             if (entryList.isEmpty()) {
                 recyclerView.setVisibility(View.GONE);
                 emptyView.setVisibility(View.VISIBLE);

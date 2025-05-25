@@ -130,8 +130,6 @@ public class MainActivity extends AppCompatActivity
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, new MapFragment())
                     .commit();
-        } else if (id == R.id.nav_gallery) {
-            Toast.makeText(this, "Fonctionnalité de galerie non implémentée", Toast.LENGTH_SHORT).show();
         }
 
         drawer.closeDrawer(GravityCompat.START);

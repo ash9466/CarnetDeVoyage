@@ -2,12 +2,15 @@ package fr.android.carnetdevoyage.fragments;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +25,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -36,6 +40,8 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -43,6 +49,9 @@ import java.util.Locale;
 public class AddEntryFragment extends Fragment {
     private static final int PERM_REQUEST = 1;
     private static final int SETTINGS_RESULT = 1;
+
+    private static final int CAMERA_REQUEST = 2;
+    private Uri imageUri;
 
     private TextInputEditText editTitle, editDescription;
     private TextView textLocationInfo;
@@ -166,8 +175,44 @@ public class AddEntryFragment extends Fragment {
     }
 
     private void takePhoto() {
-        // TODO
-        Toast.makeText(getContext(), "Photo feature not implemented", Toast.LENGTH_SHORT).show();
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.CAMERA}, CAMERA_REQUEST);
+            return;
+        }
+
+        Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        if (cameraIntent.resolveActivity(requireActivity().getPackageManager()) != null) {
+            File photoFile = createImageFile();
+            if (photoFile != null) {
+                imageUri = FileProvider.getUriForFile(requireContext(),
+                        requireContext().getPackageName() + ".fileprovider", photoFile);
+                cameraIntent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, imageUri);
+                startActivityForResult(cameraIntent, CAMERA_REQUEST);
+            }
+        }
+    }
+
+    private File createImageFile() {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = null;
+        try {
+            image = File.createTempFile(imageFileName, ".jpg", storageDir);
+            imagePath = image.getAbsolutePath(); // store path for saving in DB
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return image;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK && imageUri != null) {
+            imagePreview.setImageURI(imageUri);
+        }
     }
 
     private void saveEntry() {
